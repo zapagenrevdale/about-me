@@ -12,10 +12,10 @@ export function HeroSection() {
         <span>
           A startup enthusiast with a love for early-stage chaos — co-founded{" "}
           <Link
-            href="https://www.aetherlenz.com"
             className="granular-dash text-muted-foreground"
-            target="_blank"
+            href="https://www.aetherlenz.com"
             rel="noopener noreferrer"
+            target="_blank"
           >
             AetherLenz
           </Link>

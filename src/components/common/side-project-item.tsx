@@ -1,18 +1,18 @@
 import Link from "next/link";
 import type { SideProject } from "@/types";
 
-interface SideProjectItemProps {
+type SideProjectItemProps = {
   project: SideProject;
-}
+};
 
 export function SideProjectItem({ project }: SideProjectItemProps) {
   return (
     <div className="work-item-wrapper">
       <Link
-        href={project.url}
         className="granular-dash"
-        target="_blank"
+        href={project.url}
         rel="noopener noreferrer"
+        target="_blank"
       >
         {project.name}
       </Link>

@@ -1,19 +1,20 @@
 import Link from "next/link";
-import type { WorkExperience } from "@/types";
-import { cn } from "@/lib/utils";
 
-interface WorkItemProps {
+import { cn } from "@/lib/utils";
+import type { WorkExperience } from "@/types";
+
+type WorkItemProps = {
   work: WorkExperience;
-}
+};
 
 export function WorkItem({ work }: WorkItemProps) {
   return (
     <div className="work-item-wrapper">
       <Link
-        href={work.url}
         className={cn("granular-dash", work.className)}
-        target="_blank"
+        href={work.url}
         rel="noopener noreferrer"
+        target="_blank"
       >
         {work.company}
       </Link>

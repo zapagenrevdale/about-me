@@ -7,13 +7,8 @@ export function PostsSection() {
     <section className="mt-12 space-y-3">
       <div className="flex justify-between">
         <p className="text-muted-foreground text-xs">/POSTS</p>
-        <Link
-          href="/archive"
-          className="granular-dash text-xs"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ARCHIVE
+        <Link className="granular-dash text-xs" href="/posts">
+          VIEW ALL
         </Link>
       </div>
       {posts.map((post) => (

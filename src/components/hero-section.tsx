@@ -7,10 +7,10 @@ export function HeroSection() {
       <p className="max-w-2xl text-muted-foreground">
         Startup enthusiast with a love for early-stage chaos — co-founded{" "}
         <a
-          href="https://www.aetherlenz.com"
           className="granular-dash text-muted-foreground"
-          target="_blank"
+          href="https://www.aetherlenz.com"
           rel="noopener noreferrer"
+          target="_blank"
         >
           Aetherlenz
         </a>

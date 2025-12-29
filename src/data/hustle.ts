@@ -7,6 +7,6 @@ export const hustleProjects: Hustle[] = [
     url: "https://www.aetherlenz.com",
     period: "2025 - today",
     isActive: true,
-    className: "text-blue-400",
+    className: "text-teal-400",
   },
 ];

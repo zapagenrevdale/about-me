@@ -1,39 +1,43 @@
-export interface WorkExperience {
+import type React from "react";
+
+export type WorkExperience = {
   id: string;
   company: string;
   url: string;
   period: string;
   isActive?: boolean;
   className?: string;
-}
+};
 
-export interface Hustle {
+export type Hustle = {
   id: string;
   company: string;
   url: string;
   period: string;
   isActive?: boolean;
   className?: string;
-}
+};
 
-export interface SideProject {
+export type SideProject = {
   id: string;
   name: string;
   url: string;
   description: string;
-}
+};
 
-export interface Post {
+export type Post = {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  year: string;
+  date: string;
+  content?: string | React.ReactNode;
   url?: string;
-}
+};
 
-export interface NavigationLink {
+export type NavigationLink = {
   id: string;
   label: string;
   title: string;
   href: string;
-}
+};
