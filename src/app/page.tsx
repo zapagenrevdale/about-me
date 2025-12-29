@@ -1,24 +1,20 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HeroSection } from "@/components/sections/hero-section";
+import { NavigationLinksSection } from "@/components/sections/navigation-links-section";
+import { WorkSection } from "@/components/sections/work-section";
+import { HustleSection } from "@/components/sections/hustle-section";
+import { SideProjectsSection } from "@/components/sections/side-projects-section";
+import { PostsSection } from "@/components/sections/posts-section";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <main className="flex flex-col items-center gap-6">
-        <Avatar className="h-32 w-32">
-          <AvatarImage
-            alt="Genrev Dale Zapa"
-            src="https://github.com/shadcn.png"
-          />
-          <AvatarFallback>GZ</AvatarFallback>
-        </Avatar>
-
-        <h1 className="font-medium text-4xl tracking-tight">
-          Genrev Dale Zapa
-        </h1>
-
-        <p className="max-w-md text-center text-muted-foreground">
-          Designer, developer, and maker of things on the internet.
-        </p>
+    <div className="flex min-h-screen justify-center">
+      <main className="w-full max-w-xl py-32 text-sm">
+        <HeroSection />
+        <NavigationLinksSection />
+        <WorkSection />
+        <HustleSection />
+        <SideProjectsSection />
+        <PostsSection />
       </main>
     </div>
   );
