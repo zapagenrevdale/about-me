@@ -12,13 +12,18 @@ export function PostItem({ post }: PostItemProps) {
   const isCurrentYear = year === currentYear;
 
   return (
-    <div className="work-item-wrapper">
-      <Link className="granular-dash" href={`/posts/${year}/${post.slug}`}>
-        {post.title}
-      </Link>
-      <p className="text-neutral-400">{post.description}</p>
-      <div className="work-line" />
-      <p className={isCurrentYear ? "" : "text-muted-foreground"}>{year}</p>
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between">
+        <Link className="granular-dash" href={`/posts/${year}/${post.slug}`}>
+          {post.title}
+        </Link>
+        <p
+          className={`text-sm ${isCurrentYear ? "" : "text-muted-foreground"}`}
+        >
+          {year}
+        </p>
+      </div>
+      <p className="text-neutral-400 text-sm">{post.description}</p>
     </div>
   );
 }

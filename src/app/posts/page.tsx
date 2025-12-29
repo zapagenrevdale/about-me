@@ -7,7 +7,7 @@ import { posts } from "@/data/posts";
 export default function PostsArchive() {
   return (
     <div className="flex min-h-screen justify-center px-2 lg:px-0">
-      <main className="w-full max-w-xl py-32 text-sm">
+      <main className="w-full max-w-xl text-sm">
         <div className="flex items-center justify-between">
           <Link className="granular-dash flex w-fit items-center" href="/">
             <ArrowUpLeft className="h-4.5" /> Home

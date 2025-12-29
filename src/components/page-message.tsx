@@ -14,7 +14,7 @@ export function PageMessage({
 }: PageMessageProps) {
   return (
     <div className="flex min-h-screen justify-center px-2 lg:px-0">
-      <main className="w-full max-w-xl py-32 text-sm">
+      <main className="w-full max-w-xl text-sm">
         <Link className="granular-dash flex w-fit items-center" href="/">
           <ArrowUpLeft className="h-4.5" /> Home
         </Link>

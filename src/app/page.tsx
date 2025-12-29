@@ -7,7 +7,7 @@ import { WorkSection } from "@/components/sections/work-section";
 export default function Home() {
   return (
     <div className="flex min-h-screen justify-center">
-      <main className="w-full max-w-xl py-32 text-sm">
+      <main className="w-full max-w-xl text-sm">
         <HeroSection />
         <NavigationLinksSection />
         <WorkSection />

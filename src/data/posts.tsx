@@ -41,9 +41,9 @@ export const posts: Post[] = [
   },
   {
     id: "aetherlenz-2024",
-    slug: generateSlug("Me and AetherLenz"),
-    title: "Me and AetherLenz",
-    description: "Reminder that fortune favors the brave",
+    slug: generateSlug("Building AetherLenz"),
+    title: "Building AetherLenz",
+    description: "Believing that fortune favors the brave",
     date: "2024-02-25",
     content:
       "My journey with AetherLenz and lessons learned from taking bold decisions. Fortune favors the brave, and sometimes you need to leap before you're ready.",

@@ -45,8 +45,8 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen justify-center px-2 lg:px-0">
-      <main className="w-full max-w-xl py-32 text-sm">
+    <div className="flex min-h-screen justify-center">
+      <main className="w-full max-w-xl text-sm">
         <Link className="granular-dash flex w-fit items-center" href="/posts">
           <ArrowUpLeft className="h-4.5" /> Articles
         </Link>

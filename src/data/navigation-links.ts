@@ -16,7 +16,7 @@ export const navigationLinks: NavigationLink[] = [
   {
     id: "someday",
     label: "/SOMEDAY",
-    title: "Things I'd like to do",
+    title: "Things to do",
     href: "/someday",
   },
 ];
