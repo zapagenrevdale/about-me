@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+
 import { PageMessage } from "@/components/page-message";
 
 type ComingSoonPageProps = {
   title?: string;
   subtitle?: string;
-  description?: React.ReactNode;
+  description?: ReactNode;
 };
 
 export function ComingSoonPage({

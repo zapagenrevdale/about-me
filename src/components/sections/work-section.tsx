@@ -1,13 +1,13 @@
-import { WorkItem } from "@/components/common/work-item";
+import { TimelineItem } from "@/components/common/timeline-item";
+import { Section } from "@/components/section";
 import { workExperience } from "@/data/work-experience";
 
 export function WorkSection() {
   return (
-    <section className="mt-16 space-y-3">
-      <p className="text-muted-foreground text-xs">WORK</p>
+    <Section className="mt-16" title="WORK">
       {workExperience.map((work) => (
-        <WorkItem key={work.id} work={work} />
+        <TimelineItem item={work} key={work.id} />
       ))}
-    </section>
+    </Section>
   );
 }

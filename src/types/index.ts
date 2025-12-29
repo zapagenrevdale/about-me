@@ -1,28 +1,12 @@
-import type React from "react";
+import type { ReactNode } from "react";
 
-export type WorkExperience = {
+export type TimelineEntry = {
   id: string;
-  company: string;
-  url: string;
+  title: string;
+  href: string;
   period: string;
-  isActive?: boolean;
+  isCurrent?: boolean;
   className?: string;
-};
-
-export type Hustle = {
-  id: string;
-  company: string;
-  url: string;
-  period: string;
-  isActive?: boolean;
-  className?: string;
-};
-
-export type SideProject = {
-  id: string;
-  name: string;
-  url: string;
-  description: string;
 };
 
 export type Post = {
@@ -31,8 +15,7 @@ export type Post = {
   title: string;
   description: string;
   date: string;
-  content?: string | React.ReactNode;
-  url?: string;
+  content?: ReactNode;
 };
 
 export type NavigationLink = {

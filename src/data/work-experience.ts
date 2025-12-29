@@ -1,23 +1,23 @@
-import type { WorkExperience } from "@/types";
+import type { TimelineEntry } from "@/types";
 
-export const workExperience: WorkExperience[] = [
+export const workExperience: TimelineEntry[] = [
   {
     id: "cobi",
-    company: "Cobi",
-    url: "https://www.hellocobi.com",
+    title: "Cobi",
+    href: "https://www.hellocobi.com",
     period: "2025 - today",
-    isActive: true,
+    isCurrent: true,
   },
   {
     id: "focus-global",
-    company: "Focus Global Inc",
-    url: "https://www.focusglobalinc.com",
+    title: "Focus Global Inc",
+    href: "https://www.focusglobalinc.com",
     period: "2023 - 2025",
   },
   {
     id: "jg-summit",
-    company: "JG Summit",
-    url: "https://www.jgsummit.com.ph/our-company/company-profile",
+    title: "JG Summit",
+    href: "https://www.jgsummit.com.ph/our-company/company-profile",
     period: "2022 - 2023",
   },
 ];

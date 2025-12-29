@@ -1,8 +1,12 @@
 import { type ClassValue, clsx } from "clsx";
-import type React from "react";
+import { isValidElement, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
+const WORDS_PER_MINUTE = 200;
 const WORD_PATTERN = /\s+/;
+const NON_SLUG_CHARACTERS = /[^\w\s-]/g;
+const REPEATED_DASHES = /-+/g;
+const BOUNDARY_DASHES = /^-+|-+$/g;
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,9 +15,10 @@ export function cn(...inputs: ClassValue[]) {
 export function generateSlug(title: string): string {
   return title
     .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
+    .replace(NON_SLUG_CHARACTERS, "")
+    .replace(WORD_PATTERN, "-")
+    .replace(REPEATED_DASHES, "-")
+    .replace(BOUNDARY_DASHES, "")
     .trim();
 }
 
@@ -21,7 +26,7 @@ export function generateSlug(title: string): string {
  * Recursively extracts plain text from a React element tree.
  * Used for calculating reading time from JSX post content.
  */
-function extractTextFromReactNode(node: React.ReactNode): string {
+function extractTextFromReactNode(node: ReactNode): string {
   if (node === null || node === undefined || typeof node === "boolean") {
     return "";
   }
@@ -34,23 +39,21 @@ function extractTextFromReactNode(node: React.ReactNode): string {
     return node.map(extractTextFromReactNode).join(" ");
   }
 
-  if (typeof node === "object" && "props" in node) {
-    const element = node as React.ReactElement;
-    const props = element.props as Record<string, unknown> | undefined;
-    if (props?.children) {
-      return extractTextFromReactNode(props.children as React.ReactNode);
-    }
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return extractTextFromReactNode(node.props.children);
   }
 
   return "";
 }
 
-export function getReadTime(content: string | React.ReactNode): number {
-  const wordsPerMinute = 200;
-
+export function getReadTime(content: ReactNode): number {
   const textContent =
     typeof content === "string" ? content : extractTextFromReactNode(content);
 
-  const wordCount = textContent.trim().split(WORD_PATTERN).length;
-  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+  const trimmedContent = textContent.trim();
+  const wordCount = trimmedContent
+    ? trimmedContent.split(WORD_PATTERN).length
+    : 0;
+
+  return Math.max(1, Math.ceil(wordCount / WORDS_PER_MINUTE));
 }

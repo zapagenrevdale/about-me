@@ -1,13 +1,13 @@
-import { WorkItem } from "@/components/common/work-item";
+import { TimelineItem } from "@/components/common/timeline-item";
+import { Section } from "@/components/section";
 import { hustleProjects } from "@/data/hustle";
 
 export function HustleSection() {
   return (
-    <section className="mt-12 space-y-3">
-      <p className="text-muted-foreground text-xs">HUSTLE</p>
+    <Section className="mt-12" title="HUSTLE">
       {hustleProjects.map((hustle) => (
-        <WorkItem key={hustle.id} work={hustle} />
+        <TimelineItem item={hustle} key={hustle.id} />
       ))}
-    </section>
+    </Section>
   );
 }

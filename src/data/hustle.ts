@@ -1,12 +1,12 @@
-import type { Hustle } from "@/types";
+import type { TimelineEntry } from "@/types";
 
-export const hustleProjects: Hustle[] = [
+export const hustleProjects: TimelineEntry[] = [
   {
     id: "aetherlenz",
-    company: "AetherLenz",
-    url: "https://www.aetherlenz.com",
+    title: "AetherLenz",
+    href: "https://www.aetherlenz.com",
     period: "2025 - today",
-    isActive: true,
+    isCurrent: true,
     className: "text-teal-400",
   },
 ];
