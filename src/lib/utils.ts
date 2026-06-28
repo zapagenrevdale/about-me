@@ -3,8 +3,8 @@ import { isValidElement, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
 const WORDS_PER_MINUTE = 200;
-const WORD_PATTERN = /\s+/;
-const NON_SLUG_CHARACTERS = /[^\w\s-]/g;
+const WORD_PATTERN = /\s+/g;
+const NON_SLUG_CHARACTERS = /[^\p{Letter}\p{Mark}\p{Number}\s-]/gu;
 const REPEATED_DASHES = /-+/g;
 const BOUNDARY_DASHES = /^-+|-+$/g;
 
@@ -14,6 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function generateSlug(title: string): string {
   return title
+    .normalize("NFKC")
     .toLowerCase()
     .replace(NON_SLUG_CHARACTERS, "")
     .replace(WORD_PATTERN, "-")

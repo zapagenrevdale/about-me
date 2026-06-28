@@ -19,9 +19,19 @@ export function generateStaticParams() {
 }
 
 function findPost(year: string, slug: string) {
+  const decodedSlug = decodePostSlug(slug);
+
   return posts.find(
-    (post) => String(getPostYear(post)) === year && post.slug === slug
+    (post) => String(getPostYear(post)) === year && post.slug === decodedSlug
   );
+}
+
+function decodePostSlug(slug: string) {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
 }
 
 export async function generateMetadata({

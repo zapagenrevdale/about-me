@@ -40,15 +40,6 @@ export const posts: Post[] = [
       "Reflections on starting a new chapter in life. Thoughts on family, dreams, and what the future holds.",
   },
   {
-    id: "aetherlenz-2024",
-    slug: generateSlug("Building AetherLenz"),
-    title: "Building AetherLenz",
-    description: "Believing that fortune favors the brave",
-    date: "2024-02-25",
-    content:
-      "My journey with AetherLenz and lessons learned from taking bold decisions. Fortune favors the brave, and sometimes you need to leap before you're ready.",
-  },
-  {
     id: "indonesia-2024",
     slug: generateSlug("Seminggu di Indonesia"),
     title: "Seminggu di Indonesia",
@@ -56,6 +47,15 @@ export const posts: Post[] = [
     date: "2024-08-30",
     content:
       "A week exploring Indonesia's islands, beaches, and the warmth of its people. Adventure is the best teacher, and Indonesia has plenty to teach.",
+  },
+  {
+    id: "aetherlenz-2024",
+    slug: generateSlug("Building AetherLenz"),
+    title: "Building AetherLenz",
+    description: "Believing that fortune favors the brave",
+    date: "2024-02-25",
+    content:
+      "My journey with AetherLenz and lessons learned from taking bold decisions. Fortune favors the brave, and sometimes you need to leap before you're ready.",
   },
   {
     id: "rookie-2023",

@@ -354,6 +354,7 @@ export function DiaryEditor({
           </div>
           <div className="flex shrink-0 flex-col items-center gap-1">
             <button
+              aria-label="Close diary entry"
               className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
               disabled={isClosing}
               onClick={handleClose}
@@ -418,10 +419,12 @@ export function DiaryEditor({
                       onSubmit={applyLink}
                     >
                       <input
+                        aria-label="Link URL"
                         className="h-8 w-44 rounded-md bg-muted px-2 text-xs outline-none"
+                        inputMode="url"
                         onChange={(event) => setLinkValue(event.target.value)}
                         ref={linkInputRef}
-                        type="url"
+                        type="text"
                         value={linkValue}
                       />
                       <button
@@ -481,6 +484,7 @@ function BubbleButton({
 }: BubbleButtonProps) {
   return (
     <button
+      aria-label={title}
       className={cn(
         "inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground",
         isActive && "bg-muted text-foreground"
@@ -504,6 +508,7 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
 
   return (
     <span
+      aria-live="polite"
       className={cn(
         "pointer-events-none fixed right-5 bottom-5 z-[60] inline-flex h-8 items-center gap-1.5 text-[11px] text-muted-foreground md:right-8",
         status === "error" && "text-destructive"
@@ -515,7 +520,11 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
   );
 }
 
-function isAllowedDiaryLinkUri(value: string) {
+function isAllowedDiaryLinkUri(value: string | null | undefined) {
+  if (typeof value !== "string") {
+    return false;
+  }
+
   const href = value.trim();
 
   if (!href) {

@@ -11,6 +11,7 @@ import {
 } from "@/lib/diary-session";
 
 const HASH_PREFIX = "scrypt:v1";
+const MAX_PASSWORD_LENGTH = 256;
 
 const DEFAULT_SCRYPT_PARAMS = {
   N: 16_384,
@@ -45,6 +46,10 @@ export async function hasDiaryAuth() {
 }
 
 export async function verifyDiaryPassword(password: string) {
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return false;
+  }
+
   const parsedHash = parsePasswordHash(process.env.DIARY_PASSWORD_HASH);
 
   if (!parsedHash) {

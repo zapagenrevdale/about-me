@@ -30,10 +30,12 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} px-2.5 py-16 antialiased md:px-0 md:py-32`}
-      >
+    <html
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      lang="en"
+      suppressHydrationWarning
+    >
+      <body className="px-2.5 py-16 antialiased md:px-0 md:py-32">
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

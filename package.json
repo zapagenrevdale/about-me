@@ -28,7 +28,6 @@
     "@tiptap/starter-kit": "^3.27.1",
     "@tiptap/suggestion": "^3.27.1",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "feed": "^5.1.0",

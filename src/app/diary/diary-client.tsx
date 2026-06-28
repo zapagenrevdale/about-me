@@ -36,6 +36,7 @@ type DiaryClientProps = {
 };
 
 const DIARY_MAP_PERIOD_TYPES = ["day", "week", "month"] as const;
+const MAX_DIARY_PASSWORD_LENGTH = 256;
 const WEEK_LABELS_BY_KEY = new Map(
   LIFESPAN_WEEKS.map((week) => [week.key, week.label])
 );
@@ -392,6 +393,7 @@ function UnveilForm({ onUnveiled }: UnveilFormProps) {
         autoComplete="current-password"
         className="w-28 border-0 border-foreground/45 border-b bg-transparent px-1 pb-1 text-center font-mono text-xs outline-none ring-0 transition placeholder:text-muted-foreground focus:border-foreground focus:outline-none focus:ring-0 disabled:opacity-40"
         disabled={isPending}
+        maxLength={MAX_DIARY_PASSWORD_LENGTH}
         name="password"
         onKeyDown={(event) => {
           if (event.key !== "Enter" || event.nativeEvent.isComposing) {
@@ -481,6 +483,7 @@ function DiaryEntryLoading({
             </h1>
           </div>
           <button
+            aria-label="Close diary entry"
             className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
             onClick={onClose}
             title="Close"

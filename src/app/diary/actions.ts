@@ -3,7 +3,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-import { db } from "@/db";
+import { getDb } from "@/db";
 import { diaryEntries } from "@/db/schema";
 import {
   clearDiarySessionCookie,
@@ -100,6 +100,7 @@ export async function getDiaryEntrySummaries(
   const visibilityWhere = isOwner
     ? periodWhere
     : and(periodWhere, eq(diaryEntries.isPublic, true));
+  const db = getDb();
 
   return await db
     .select({
@@ -127,6 +128,7 @@ export async function getDiaryEntry(
         eq(diaryEntries.periodKey, periodKey),
         eq(diaryEntries.isPublic, true)
       );
+  const db = getDb();
 
   const [entry] = await db
     .select()
@@ -146,6 +148,7 @@ export async function upsertDiaryEntry(
 
   const now = new Date().toISOString();
   const plainText = input.plainText.trim().slice(0, MAX_PLAIN_TEXT_LENGTH);
+  const db = getDb();
 
   const rows = await db
     .insert(diaryEntries)
@@ -185,6 +188,8 @@ export async function deleteDiaryEntry(periodKey: string): Promise<string> {
   await requireDiaryAuth();
 
   validatePeriodKey(periodKey);
+
+  const db = getDb();
 
   await db.delete(diaryEntries).where(eq(diaryEntries.periodKey, periodKey));
 
