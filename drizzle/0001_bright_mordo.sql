@@ -1,0 +1,1 @@
+ALTER TABLE `diary_entries` ADD `is_public` integer DEFAULT false NOT NULL;

@@ -14,9 +14,9 @@ export const navigationLinks: NavigationLink[] = [
     href: "/now",
   },
   {
-    id: "someday",
-    label: "/SOMEDAY",
-    title: "Things to do",
-    href: "/someday",
+    id: "diary",
+    label: "/DIARY",
+    title: "Lifespan log",
+    href: "/diary",
   },
 ];
