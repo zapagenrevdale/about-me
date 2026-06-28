@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 
 import {
   END_DATE_LABEL,
+  formatNumericDateKey,
+  formatNumericMonthKey,
   getLifespanWeekKey,
   LIFESPAN_DAY_KEYS,
   LIFESPAN_MONTH_YEARS,
@@ -574,7 +576,7 @@ function MonthYearRow({
               key={month.key}
               periodKey={month.key}
               state={state}
-              tooltip={`${month.label} ${year.year}`}
+              tooltip={formatNumericMonthKey(month.key)}
             />
           );
         })}
@@ -692,7 +694,7 @@ function ShrinkGrid({
             key={month.key}
             periodKey={month.key}
             state={state}
-            tooltip={`${month.label} ${month.year}`}
+            tooltip={formatNumericMonthKey(month.key)}
           />
         );
       })}
@@ -1233,7 +1235,7 @@ function formatDayTooltip(dateKey: string) {
     new Date(Date.UTC(year, month - 1, day))
   );
 
-  return `${weekday}, ${dateKey}`;
+  return `${weekday}, ${formatNumericDateKey(dateKey)}`;
 }
 
 function getDayTooltip(dateKey: string) {

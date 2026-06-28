@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { GitHubContributions } from "@/components/common/github-contributions";
 import { PostItem } from "@/components/common/post-item";
 import { Section } from "@/components/section";
 import { posts } from "@/data/posts";
@@ -18,6 +19,7 @@ export function PostsSection() {
       {posts.map((post) => (
         <PostItem key={post.id} post={post} />
       ))}
+      <GitHubContributions />
     </Section>
   );
 }

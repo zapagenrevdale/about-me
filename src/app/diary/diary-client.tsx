@@ -14,7 +14,12 @@ import {
 } from "react";
 
 import { BackLink } from "@/components/back-link";
-import { LIFESPAN_MONTHS, LIFESPAN_WEEKS } from "../someday/lifespan-data";
+import {
+  formatNumericDateKey,
+  formatNumericMonthKey,
+  LIFESPAN_MONTHS,
+  LIFESPAN_WEEKS,
+} from "../someday/lifespan-data";
 import {
   type LifeBoxEntryState,
   LifespanGrid,
@@ -43,18 +48,6 @@ const WEEK_LABELS_BY_KEY = new Map(
 const MONTHS_BY_KEY = new Map(
   LIFESPAN_MONTHS.map((month) => [month.key, month])
 );
-const FULL_DATE_FORMATTER = new Intl.DateTimeFormat(undefined, {
-  day: "numeric",
-  month: "long",
-  timeZone: "UTC",
-  weekday: "long",
-  year: "numeric",
-});
-const MONTH_FORMATTER = new Intl.DateTimeFormat(undefined, {
-  month: "long",
-  timeZone: "UTC",
-  year: "numeric",
-});
 const DiaryEditor = dynamic(
   () => import("./diary-editor").then((mod) => mod.DiaryEditor),
   {
@@ -572,19 +565,13 @@ function getDiaryPeriodKey(mode: LifespanMode, lifespanKey: string) {
 }
 
 function formatFullDate(dateKey: string) {
-  return FULL_DATE_FORMATTER.format(parseUtcDateKey(dateKey));
+  return formatNumericDateKey(dateKey);
 }
 
 function formatShortDate(dateKey: string) {
-  return dateKey;
+  return formatNumericDateKey(dateKey);
 }
 
 function formatMonthRange(monthKey: string) {
-  const [year, month] = monthKey.split("-").map(Number);
-  return MONTH_FORMATTER.format(new Date(Date.UTC(year, month - 1, 1)));
-}
-
-function parseUtcDateKey(dateKey: string) {
-  const [year, month, day] = dateKey.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day));
+  return formatNumericMonthKey(monthKey);
 }

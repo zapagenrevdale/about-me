@@ -7,19 +7,13 @@ export const START_DATE_KEY = "2026-06-28";
 export const END_DATE_KEY = "2056-11-30";
 export const START_MONTH_KEY = "2026-06";
 export const START_WEEK_KEY = START_DATE_KEY;
-export const START_DATE_LABEL = "June 28, 2026";
-export const END_DATE_LABEL = "November 30, 2056";
+export const START_DATE_LABEL = formatNumericDateKey(START_DATE_KEY);
+export const END_DATE_LABEL = formatNumericDateKey(END_DATE_KEY);
 
 const START_DATE_UTC = Date.UTC(2026, 5, 28);
 const END_DATE_UTC = Date.UTC(2056, 10, 30);
 const START_MONTH_INDEX = new Date(START_DATE_UTC).getUTCMonth();
 const END_MONTH_INDEX = new Date(END_DATE_UTC).getUTCMonth();
-const WEEK_LABEL_FORMATTER = new Intl.DateTimeFormat(undefined, {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
 const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat(undefined, {
   month: "short",
   timeZone: "UTC",
@@ -98,6 +92,20 @@ export function getLifespanWeekKey(date: Date) {
   return toDateKey(START_DATE_UTC + weekIndex * MS_PER_WEEK);
 }
 
+export function formatNumericDateKey(dateKey: string) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return `${formatDatePart(month)}.${formatDatePart(day)}.${year}`;
+}
+
+export function formatNumericMonthKey(monthKey: string) {
+  const [year, month] = monthKey.split("-").map(Number);
+  return `${formatDatePart(month)}.${year}`;
+}
+
+function formatDatePart(value: number) {
+  return String(value).padStart(2, "0");
+}
+
 function createLifespanYears(): LifespanYear[] {
   return Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, index) => {
     const year = START_YEAR + index;
@@ -151,9 +159,7 @@ function createLifespanWeekYears(): LifespanWeekYear[] {
 }
 
 function formatWeekLabel(startTimestamp: number, endTimestamp: number) {
-  return `${WEEK_LABEL_FORMATTER.format(
-    new Date(startTimestamp)
-  )} - ${WEEK_LABEL_FORMATTER.format(new Date(endTimestamp))}`;
+  return `${formatNumericDateKey(toDateKey(startTimestamp))} - ${formatNumericDateKey(toDateKey(endTimestamp))}`;
 }
 
 function createLifespanMonthYears(): LifespanMonthYear[] {
