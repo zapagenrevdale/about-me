@@ -1,12 +1,14 @@
 "use client";
 
 import { X } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
   type ReactNode,
   useActionState,
   useCallback,
   useEffect,
+  useRef,
   useState,
   useTransition,
 } from "react";
@@ -25,7 +27,6 @@ import {
   unveilDiary,
   veilDiary,
 } from "./actions";
-import { DiaryEditor } from "./diary-editor";
 import type { DiaryEntryRecord, DiaryEntrySummary, DiaryPeriod } from "./types";
 
 type EntriesByKey = Record<string, DiaryEntrySummary>;
@@ -53,6 +54,13 @@ const MONTH_FORMATTER = new Intl.DateTimeFormat(undefined, {
   timeZone: "UTC",
   year: "numeric",
 });
+const DiaryEditor = dynamic(
+  () => import("./diary-editor").then((mod) => mod.DiaryEditor),
+  {
+    loading: () => <DiaryEditorBoot />,
+    ssr: false,
+  }
+);
 
 export function DiaryClient({ initialIsUnveiled }: DiaryClientProps) {
   const router = useRouter();
@@ -64,63 +72,90 @@ export function DiaryClient({ initialIsUnveiled }: DiaryClientProps) {
   >();
   const [isEntryLoading, setIsEntryLoading] = useState(false);
   const [entryError, setEntryError] = useState<string | null>(null);
-  const [summaryReloadKey, setSummaryReloadKey] = useState(0);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(true);
   const [gridFocusKey, setGridFocusKey] = useState(0);
-  const [isSummaryPending, startSummaryTransition] = useTransition();
+  const summaryRequestRef = useRef(0);
+  const entryRequestRef = useRef(0);
+
+  const loadSummaries = useCallback(() => {
+    summaryRequestRef.current += 1;
+    const requestId = summaryRequestRef.current;
+
+    setIsSummaryLoading(true);
+
+    getDiaryEntrySummaries(DIARY_MAP_PERIOD_TYPES)
+      .then((entries) => {
+        if (summaryRequestRef.current !== requestId) {
+          return;
+        }
+
+        setEntriesByKey(indexDiaryEntrySummaries(entries));
+      })
+      .catch(() => {
+        if (summaryRequestRef.current === requestId) {
+          setEntriesByKey({});
+        }
+      })
+      .finally(() => {
+        if (summaryRequestRef.current === requestId) {
+          setIsSummaryLoading(false);
+        }
+      });
+  }, []);
 
   useEffect(() => {
-    let isActive = true;
-    const requestedReloadKey = summaryReloadKey;
-
-    startSummaryTransition(() => {
-      Promise.all(
-        DIARY_MAP_PERIOD_TYPES.map((periodType) =>
-          getDiaryEntrySummaries(periodType)
-        )
-      )
-        .then((entryGroups) => {
-          if (!isActive || requestedReloadKey !== summaryReloadKey) {
-            return;
-          }
-
-          setEntriesByKey(
-            Object.fromEntries(
-              entryGroups.flat().map((entry) => [entry.periodKey, entry])
-            )
-          );
-        })
-        .catch(() => {
-          if (isActive && requestedReloadKey === summaryReloadKey) {
-            setEntriesByKey({});
-          }
-        });
-    });
+    loadSummaries();
 
     return () => {
-      isActive = false;
+      summaryRequestRef.current += 1;
     };
-  }, [summaryReloadKey]);
+  }, [loadSummaries]);
 
   const getBoxEntry = useCallback(
-    (
-      mode: LifespanMode,
-      lifespanKey: string
-    ): LifeBoxEntryState | undefined => {
-      const entry = entriesByKey[getDiaryPeriodKey(mode, lifespanKey)];
-
-      return entry ? { isPublic: entry.isPublic } : undefined;
-    },
+    (mode: LifespanMode, lifespanKey: string): LifeBoxEntryState | undefined =>
+      entriesByKey[getDiaryPeriodKey(mode, lifespanKey)],
     [entriesByKey]
   );
 
+  const loadActiveEntry = useCallback(
+    async (periodKey: string, requestId: number) => {
+      try {
+        const entry = await getDiaryEntry(periodKey);
+
+        if (entryRequestRef.current !== requestId) {
+          return;
+        }
+
+        if (!entry) {
+          setEntryError("This entry is not available.");
+          return;
+        }
+
+        setActiveEntry(entry);
+      } catch {
+        if (entryRequestRef.current === requestId) {
+          setEntryError("This entry could not be opened.");
+        }
+      } finally {
+        if (entryRequestRef.current === requestId) {
+          setIsEntryLoading(false);
+        }
+      }
+    },
+    []
+  );
+
   const openLifeBox = useCallback(
-    async (mode: LifespanMode, lifespanKey: string) => {
+    (mode: LifespanMode, lifespanKey: string) => {
       const period = createDiaryPeriod(mode, lifespanKey);
       const summary = entriesByKey[period.key];
 
       if (!(isUnveiled || summary?.isPublic)) {
         return;
       }
+
+      entryRequestRef.current += 1;
+      const requestId = entryRequestRef.current;
 
       setActivePeriod(period);
       setActiveEntry(undefined);
@@ -132,68 +167,56 @@ export function DiaryClient({ initialIsUnveiled }: DiaryClientProps) {
       }
 
       setIsEntryLoading(true);
-
-      try {
-        const entry = await getDiaryEntry(period.key);
-
-        if (!entry) {
-          setEntryError("This entry is not available.");
-          return;
-        }
-
-        setActiveEntry(entry);
-      } catch {
-        setEntryError("This entry could not be opened.");
-      } finally {
-        setIsEntryLoading(false);
-      }
+      loadActiveEntry(period.key, requestId).catch(() => undefined);
     },
-    [entriesByKey, isUnveiled]
+    [entriesByKey, isUnveiled, loadActiveEntry]
   );
 
-  const handleSaved = (entry: DiaryEntryRecord) => {
+  const handleSaved = useCallback((entry: DiaryEntryRecord) => {
     setActiveEntry(entry);
     setEntriesByKey((currentEntries) => ({
       ...currentEntries,
       [entry.periodKey]: toDiaryEntrySummary(entry),
     }));
-  };
+  }, []);
 
-  const handleDeleted = (periodKey: string) => {
+  const handleDeleted = useCallback((periodKey: string) => {
     setActiveEntry(undefined);
     setEntriesByKey((currentEntries) => {
       const nextEntries = { ...currentEntries };
       delete nextEntries[periodKey];
       return nextEntries;
     });
-  };
+  }, []);
 
   const requestGridFocus = useCallback(() => {
     setGridFocusKey((currentKey) => currentKey + 1);
   }, []);
 
   const closeActiveEditor = useCallback(() => {
+    entryRequestRef.current += 1;
     setActivePeriod(null);
+    setIsEntryLoading(false);
     requestGridFocus();
   }, [requestGridFocus]);
 
   const handleUnveiled = useCallback(() => {
     setIsUnveiled(true);
     setEntriesByKey({});
-    setSummaryReloadKey((currentKey) => currentKey + 1);
+    loadSummaries();
     requestGridFocus();
     router.refresh();
-  }, [requestGridFocus, router]);
+  }, [loadSummaries, requestGridFocus, router]);
 
   const handleVeiled = useCallback(() => {
     setIsUnveiled(false);
     setEntriesByKey({});
     setActivePeriod(null);
     setActiveEntry(undefined);
-    setSummaryReloadKey((currentKey) => currentKey + 1);
+    loadSummaries();
     requestGridFocus();
     router.refresh();
-  }, [requestGridFocus, router]);
+  }, [loadSummaries, requestGridFocus, router]);
 
   let activeEditor: ReactNode = null;
 
@@ -225,7 +248,7 @@ export function DiaryClient({ initialIsUnveiled }: DiaryClientProps) {
     );
   }
 
-  const statusLabel = getStatusLabel(isSummaryPending, isUnveiled);
+  const statusLabel = getStatusLabel(isSummaryLoading, isUnveiled);
 
   return (
     <div className="relative min-h-[calc(100vh-8rem)] pb-20">
@@ -323,6 +346,18 @@ function DiaryAuthControl({
         <UnveilForm onUnveiled={onUnveiled} />
       )}
     </div>
+  );
+}
+
+function DiaryEditorBoot() {
+  return (
+    <aside className="fixed inset-0 z-50 flex bg-background/80 backdrop-blur-sm md:justify-end">
+      <div className="flex h-full w-full flex-col border-border border-l bg-background md:max-w-2xl">
+        <div className="flex-1 px-5 py-8 text-muted-foreground text-sm md:px-12">
+          Loading editor...
+        </div>
+      </div>
+    </aside>
   );
 }
 
@@ -472,6 +507,10 @@ function toDiaryEntrySummary(entry: DiaryEntryRecord): DiaryEntrySummary {
     createdAt: entry.createdAt,
     updatedAt: entry.updatedAt,
   };
+}
+
+function indexDiaryEntrySummaries(entries: DiaryEntrySummary[]): EntriesByKey {
+  return Object.fromEntries(entries.map((entry) => [entry.periodKey, entry]));
 }
 
 function getStatusLabel(isSummaryPending: boolean, isUnveiled: boolean) {

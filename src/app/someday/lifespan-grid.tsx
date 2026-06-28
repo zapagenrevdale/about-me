@@ -19,12 +19,9 @@ import { cn } from "@/lib/utils";
 
 import {
   getLifespanWeekKey,
-  LIFESPAN_DAY_COUNT,
   LIFESPAN_DAY_KEYS,
-  LIFESPAN_MONTH_COUNT,
   LIFESPAN_MONTH_YEARS,
   LIFESPAN_MONTHS,
-  LIFESPAN_WEEK_COUNT,
   LIFESPAN_WEEK_YEARS,
   LIFESPAN_WEEKS,
   LIFESPAN_YEARS,
@@ -57,6 +54,14 @@ const DAY_TOOLTIP_FORMATTER = new Intl.DateTimeFormat(undefined, {
   timeZone: "UTC",
   weekday: "short",
 });
+const LIFESPAN_WEEK_KEYS = LIFESPAN_WEEKS.map((week) => week.key);
+const LIFESPAN_MONTH_KEYS = LIFESPAN_MONTHS.map((month) => month.key);
+const DAY_INDEX_BY_KEY = createIndexByKey(LIFESPAN_DAY_KEYS);
+const WEEK_INDEX_BY_KEY = createIndexByKey(LIFESPAN_WEEK_KEYS);
+const MONTH_INDEX_BY_KEY = createIndexByKey(LIFESPAN_MONTH_KEYS);
+const DAY_TOOLTIP_BY_KEY = new Map(
+  LIFESPAN_DAY_KEYS.map((dateKey) => [dateKey, formatDayTooltip(dateKey)])
+);
 
 type LifespanLayout = (typeof LAYOUTS)[number];
 export type LifespanMode = (typeof MODES)[number];
@@ -461,7 +466,7 @@ function DayYearRow({
               key={dateKey}
               periodKey={dateKey}
               state={state}
-              tooltip={formatDayTooltip(dateKey)}
+              tooltip={getDayTooltip(dateKey)}
             />
           );
         })}
@@ -632,7 +637,7 @@ function ShrinkGrid({
               key={dateKey}
               periodKey={dateKey}
               state={state}
-              tooltip={formatDayTooltip(dateKey)}
+              tooltip={getDayTooltip(dateKey)}
             />
           );
         })}
@@ -909,10 +914,14 @@ function updateSelectedKeyFromElement(
     return;
   }
 
-  setSelectedKeys((currentKeys) => ({
-    ...currentKeys,
-    [mode]: lifeKey,
-  }));
+  setSelectedKeys((currentKeys) =>
+    currentKeys[mode] === lifeKey
+      ? currentKeys
+      : {
+          ...currentKeys,
+          [mode]: lifeKey,
+        }
+  );
 }
 
 function getTooltipLabel(target: EventTarget) {
@@ -1193,27 +1202,23 @@ function getRemainingPeriodCount(
 }
 
 function getRemainingDayCount(currentDayKey: string | null) {
-  if (currentDayKey === null) {
-    return LIFESPAN_DAY_COUNT;
-  }
-
-  return LIFESPAN_DAY_KEYS.filter((dateKey) => dateKey >= currentDayKey).length;
+  return getRemainingCount(currentDayKey, LIFESPAN_DAY_KEYS, DAY_INDEX_BY_KEY);
 }
 
 function getRemainingWeekCount(currentWeekKey: string | null) {
-  if (currentWeekKey === null) {
-    return LIFESPAN_WEEK_COUNT;
-  }
-
-  return LIFESPAN_WEEKS.filter((week) => week.key >= currentWeekKey).length;
+  return getRemainingCount(
+    currentWeekKey,
+    LIFESPAN_WEEK_KEYS,
+    WEEK_INDEX_BY_KEY
+  );
 }
 
 function getRemainingMonthCount(currentMonthKey: string | null) {
-  if (currentMonthKey === null) {
-    return LIFESPAN_MONTH_COUNT;
-  }
-
-  return LIFESPAN_MONTHS.filter((month) => month.key >= currentMonthKey).length;
+  return getRemainingCount(
+    currentMonthKey,
+    LIFESPAN_MONTH_KEYS,
+    MONTH_INDEX_BY_KEY
+  );
 }
 
 function formatPeriodLeftLabel(count: number, period: string) {
@@ -1227,6 +1232,32 @@ function formatDayTooltip(dateKey: string) {
   );
 
   return `${weekday}, ${dateKey}`;
+}
+
+function getDayTooltip(dateKey: string) {
+  return DAY_TOOLTIP_BY_KEY.get(dateKey) ?? dateKey;
+}
+
+function createIndexByKey(keys: readonly string[]) {
+  return new Map(keys.map((key, index) => [key, index]));
+}
+
+function getRemainingCount(
+  currentKey: string | null,
+  keys: readonly string[],
+  indexByKey: ReadonlyMap<string, number>
+) {
+  if (currentKey === null) {
+    return keys.length;
+  }
+
+  const currentIndex = indexByKey.get(currentKey);
+
+  if (currentIndex !== undefined) {
+    return keys.length - currentIndex;
+  }
+
+  return currentKey > (keys.at(-1) ?? "") ? 0 : keys.length;
 }
 
 function formatLocalDateKey(date: Date) {

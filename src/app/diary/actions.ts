@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { db } from "@/db";
@@ -72,19 +72,34 @@ export async function veilDiary() {
 }
 
 export async function getDiaryEntrySummaries(
-  periodType: DiaryPeriodType
+  periodTypes: readonly DiaryPeriodType[]
 ): Promise<DiaryEntrySummary[]> {
-  if (!isDiaryPeriodType(periodType)) {
-    throw new Error("Invalid diary period type.");
+  if (!Array.isArray(periodTypes)) {
+    throw new Error("Diary period types must be an array.");
+  }
+
+  const uniquePeriodTypes = Array.from(new Set(periodTypes));
+
+  for (const periodType of uniquePeriodTypes) {
+    if (!isDiaryPeriodType(periodType)) {
+      throw new Error("Invalid diary period type.");
+    }
+  }
+
+  const [firstPeriodType] = uniquePeriodTypes;
+
+  if (!firstPeriodType) {
+    return [];
   }
 
   const isOwner = await hasDiaryAuth();
+  const periodWhere =
+    uniquePeriodTypes.length === 1
+      ? eq(diaryEntries.periodType, firstPeriodType)
+      : inArray(diaryEntries.periodType, uniquePeriodTypes);
   const visibilityWhere = isOwner
-    ? eq(diaryEntries.periodType, periodType)
-    : and(
-        eq(diaryEntries.periodType, periodType),
-        eq(diaryEntries.isPublic, true)
-      );
+    ? periodWhere
+    : and(periodWhere, eq(diaryEntries.isPublic, true));
 
   return await db
     .select({
@@ -105,21 +120,21 @@ export async function getDiaryEntry(
 ): Promise<DiaryEntryRecord | null> {
   validatePeriodKey(periodKey);
 
+  const isOwner = await hasDiaryAuth();
+  const visibilityWhere = isOwner
+    ? eq(diaryEntries.periodKey, periodKey)
+    : and(
+        eq(diaryEntries.periodKey, periodKey),
+        eq(diaryEntries.isPublic, true)
+      );
+
   const [entry] = await db
     .select()
     .from(diaryEntries)
-    .where(eq(diaryEntries.periodKey, periodKey))
+    .where(visibilityWhere)
     .limit(1);
 
-  if (!entry) {
-    return null;
-  }
-
-  if (entry.isPublic || (await hasDiaryAuth())) {
-    return entry;
-  }
-
-  return null;
+  return entry ?? null;
 }
 
 export async function upsertDiaryEntry(
@@ -237,6 +252,9 @@ function validateContentJson(contentJson: unknown) {
   JSON.stringify(contentJson);
 }
 
-function isDiaryPeriodType(value: string): value is DiaryPeriodType {
-  return DIARY_PERIOD_TYPES.includes(value as DiaryPeriodType);
+function isDiaryPeriodType(value: unknown): value is DiaryPeriodType {
+  return (
+    typeof value === "string" &&
+    DIARY_PERIOD_TYPES.includes(value as DiaryPeriodType)
+  );
 }

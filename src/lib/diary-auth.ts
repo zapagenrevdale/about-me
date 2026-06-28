@@ -1,7 +1,6 @@
 import { type ScryptOptions, scrypt, timingSafeEqual } from "node:crypto";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 import {
   createDiarySessionToken,
@@ -26,17 +25,9 @@ type ParsedPasswordHash = {
   hash: Buffer;
 };
 
-type RequireDiaryAuthOptions = {
-  redirectToLogin?: boolean;
-};
-
-export async function requireDiaryAuth(options: RequireDiaryAuthOptions = {}) {
+export async function requireDiaryAuth() {
   if (await hasDiaryAuth()) {
     return;
-  }
-
-  if (options.redirectToLogin) {
-    redirect("/diary/login");
   }
 
   throw new Error("Unauthorized diary access.");

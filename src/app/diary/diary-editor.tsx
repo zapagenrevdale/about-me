@@ -22,11 +22,10 @@ import {
 import { cn } from "@/lib/utils";
 
 import { deleteDiaryEntry, upsertDiaryEntry } from "./actions";
-import { EMPTY_TIPTAP_DOCUMENT } from "./date-utils";
 import { SlashCommand } from "./slash-command";
 import type { DiaryEntryRecord, DiaryPeriod } from "./types";
 
-type DiaryEditorProps = {
+export type DiaryEditorProps = {
   period: DiaryPeriod;
   entry?: DiaryEntryRecord;
   isReadOnly?: boolean;
@@ -45,6 +44,16 @@ type EditorDraft = {
 };
 
 const SAVE_DEBOUNCE_MS = 700;
+const ALLOWED_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:"]);
+const EXPLICIT_PROTOCOL_PATTERN = /^[a-z][a-z0-9+.-]*:/i;
+const EMPTY_TIPTAP_DOCUMENT = {
+  type: "doc",
+  content: [
+    {
+      type: "paragraph",
+    },
+  ],
+} satisfies JSONContent;
 
 export function DiaryEditor({
   period,
@@ -78,6 +87,8 @@ export function DiaryEditor({
       }),
       LinkExtension.configure({
         autolink: true,
+        defaultProtocol: "https",
+        isAllowedUri: isAllowedDiaryLinkUri,
         linkOnPaste: true,
         openOnClick: false,
       }),
@@ -265,18 +276,15 @@ export function DiaryEditor({
       return;
     }
 
-    if (linkValue.trim() === "") {
+    const href = linkValue.trim();
+
+    if (href === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();
       setIsLinkInputOpen(false);
       return;
     }
 
-    editor
-      .chain()
-      .focus()
-      .extendMarkRange("link")
-      .setLink({ href: linkValue.trim() })
-      .run();
+    editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
     setIsLinkInputOpen(false);
   };
 
@@ -322,6 +330,7 @@ export function DiaryEditor({
     }
 
     setIsPublic(nextIsPublic);
+    isPublicRef.current = nextIsPublic;
 
     queueDraft({
       contentJson: editor.getJSON(),
@@ -504,4 +513,23 @@ function SaveIndicator({ status }: { status: SaveStatus }) {
       {label}
     </span>
   );
+}
+
+function isAllowedDiaryLinkUri(value: string) {
+  const href = value.trim();
+
+  if (!href) {
+    return false;
+  }
+
+  try {
+    const url = new URL(hasExplicitProtocol(href) ? href : `https://${href}`);
+    return ALLOWED_LINK_PROTOCOLS.has(url.protocol);
+  } catch {
+    return false;
+  }
+}
+
+function hasExplicitProtocol(value: string) {
+  return EXPLICIT_PROTOCOL_PATTERN.test(value);
 }

@@ -1,22 +1,28 @@
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MS_PER_WEEK = 7 * MS_PER_DAY;
 
-export const START_YEAR = 1996;
+export const START_YEAR = 2026;
 export const END_YEAR = 2056;
-export const START_DATE_KEY = "1996-11-30";
+export const START_DATE_KEY = "2026-06-28";
 export const END_DATE_KEY = "2056-11-30";
-export const START_MONTH_KEY = "1996-11";
+export const START_MONTH_KEY = "2026-06";
 export const START_WEEK_KEY = START_DATE_KEY;
-export const START_DATE_LABEL = "November 30, 1996";
+export const START_DATE_LABEL = "June 28, 2026";
 export const END_DATE_LABEL = "November 30, 2056";
 
-const START_DATE_UTC = Date.UTC(1996, 10, 30);
+const START_DATE_UTC = Date.UTC(2026, 5, 28);
 const END_DATE_UTC = Date.UTC(2056, 10, 30);
+const START_MONTH_INDEX = new Date(START_DATE_UTC).getUTCMonth();
+const END_MONTH_INDEX = new Date(END_DATE_UTC).getUTCMonth();
 const WEEK_LABEL_FORMATTER = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
   month: "short",
   timeZone: "UTC",
   year: "numeric",
+});
+const MONTH_LABEL_FORMATTER = new Intl.DateTimeFormat(undefined, {
+  month: "short",
+  timeZone: "UTC",
 });
 
 export type LifespanYear = {
@@ -153,8 +159,8 @@ function formatWeekLabel(startTimestamp: number, endTimestamp: number) {
 function createLifespanMonthYears(): LifespanMonthYear[] {
   return Array.from({ length: END_YEAR - START_YEAR + 1 }, (_, index) => {
     const year = START_YEAR + index;
-    const firstMonth = year === START_YEAR ? 10 : 0;
-    const lastMonth = year === END_YEAR ? 10 : 11;
+    const firstMonth = year === START_YEAR ? START_MONTH_INDEX : 0;
+    const lastMonth = year === END_YEAR ? END_MONTH_INDEX : 11;
 
     return {
       months: Array.from(
@@ -164,10 +170,9 @@ function createLifespanMonthYears(): LifespanMonthYear[] {
 
           return {
             key: `${year}-${String(month + 1).padStart(2, "0")}`,
-            label: new Intl.DateTimeFormat(undefined, {
-              month: "short",
-              timeZone: "UTC",
-            }).format(new Date(Date.UTC(year, month, 1))),
+            label: MONTH_LABEL_FORMATTER.format(
+              new Date(Date.UTC(year, month, 1))
+            ),
           };
         }
       ),
