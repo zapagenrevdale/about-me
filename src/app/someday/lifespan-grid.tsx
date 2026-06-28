@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import {
+  END_DATE_LABEL,
   getLifespanWeekKey,
   LIFESPAN_DAY_KEYS,
   LIFESPAN_MONTH_YEARS,
@@ -26,6 +27,7 @@ import {
   LIFESPAN_WEEKS,
   LIFESPAN_YEARS,
   START_DATE_KEY,
+  START_DATE_LABEL,
   START_MONTH_KEY,
   START_WEEK_KEY,
 } from "./lifespan-data";
@@ -261,7 +263,7 @@ export function LifespanGrid({
           </p>
           {isShrinkLayout ? (
             <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.16em]">
-              1996.11 — 2056.11
+              {START_DATE_LABEL} — {END_DATE_LABEL}
             </p>
           ) : null}
         </div>
